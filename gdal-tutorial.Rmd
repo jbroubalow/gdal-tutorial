@@ -6,7 +6,7 @@ output: html_document
 ---
 ## Introduction
 
-Geospatial Data Abstraction Library (GDAL) is a computer software library for reading and writing raster and vector geospatial data formats. What we're going to do is use GDAL to map census data after downloading and simplifying our spatial data. Both the census data and spatial data will come from the NHGIS, but there are two problems with the spatial data that don't make them immediately useable to us in R: 1) They are too big and 2) They are in the wrong projection.
+The Geospatial Data Abstraction Library (GDAL) is a computer software library for reading and writing raster and vector geospatial data formats. What we're going to do is use GDAL to map census data after downloading and simplifying our spatial data. Both the census data and spatial data will come from the NHGIS, but there are two problems with the spatial data that don't make them immediately useable to us in R: 1) They are too big and 2) They are in the wrong projection.
 
 To do all this, we'll be using a combination of a web browser and R (and optionally a command line).
 
