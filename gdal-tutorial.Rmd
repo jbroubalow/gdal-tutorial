@@ -1,18 +1,18 @@
 ---
-title: "GDAL Tutorial"
+title: "Using NHGIS in R"
 author: "Justin Broubalow"
 date: "4/3/2017"
 output: html_document
 ---
 ## Introduction
 
-The Geospatial Data Abstraction Library (GDAL) is a computer software library for reading and writing raster and vector geospatial data formats. What we're going to do is use GDAL to map census data after downloading and simplifying our spatial data. Both the census data and spatial data will come from the NHGIS, but there are two problems with the spatial data that don't make them immediately useable to us in R: 1) They are too big and 2) They are in the wrong projection.
+[Geospatial Data Abstraction Library (GDAL)](http://www.gdal.org/) is a computer software library for reading and writing raster and vector geospatial data formats. What we're going to do is use GDAL to map census data after downloading and simplifying our spatial data. Luckily, we already have access to GDAL's set of tools in the sf package for R. Both the census data and spatial data will come from the NHGIS, but there are two problems with the spatial data that don't make them immediately useable to us in R: 1) They are too big and 2) They are in the wrong projection. This tutorial will guide you through the process of being able to use NHGIS's census data in R.
 
 To do all this, we'll be using a combination of a web browser and R (and optionally a command line).
 
 First, let's load the packages we'll be using.
 
-```{r}
+```{r, message=FALSE}
 library(sf)
 library(leaflet)
 library(tidyverse)
@@ -22,7 +22,7 @@ library(tidyverse)
 
 For this step we'll be using just a web browser.
 
-1. Go to NHGIS <https://www.nhgis.org/>. Click "Get Data."
+1. Go to [NHGIS](https://www.nhgis.org/). Click "Get Data."
 
 2. Choose the geographic levels and year of data you want.
 
@@ -38,9 +38,9 @@ For the purpose of this tutorial, we're going to be using state-level population
 
 ## Simplifying the Shapefile
 
-The next step is to simplify the shapefile within the spatial data so that it is easier to manage and read into RStudio. We will do this step in our web browsers using <http://www.mapshaper.org/> and RStudio.
+The next step is to simplify the shapefile within the spatial data so that it is easier to manage and read into RStudio. We will do this step in our web browsers using [Map Shaper](http://www.mapshaper.org/) and RStudio.
 
-1. Use the home screen to upload your shapefile to Map Shaper. Click "Upload" to do so.
+1. Use the home screen to upload your spatial data to Map Shaper. You can upload the entire `nhgis0002_shape.zip` folder, and it will automatically extract the shapefile. Click "Upload" to do so.
 
 2. Now we want to simplify the lines of the map so that we reduce the file's size. Do that by clicking "Simplify" in the top-right corner and sliding the "Settings." Lower percentages mean fewer lines and smaller shapefile sizes. How much you want to simplify depends on the level of detail you need. I have simplified our map to 1 percent because we're only interested in state boundaries.
 
@@ -48,11 +48,11 @@ The next step is to simplify the shapefile within the spatial data so that it is
 
 4. Replace the old, unsimplified shapefile with the new, simplified one that you just downloaded. Note that the size of the new shapefile is much smaller than the old one.
 
-5. Upload the `.zip` folder containing your new shapefile. Also upload the the folder containing the census data.
+5. Upload the `.zip` folder containing your new shapefile to RStudio. RStudio will automatically extract the `.shp` file and the other necessary files. Also upload to RStudio the the folder containing the census data.
 
 6. Read in the shapefile and the census data (Note that I've also renamed the NGHIS code "A7L001" for the sake of clarity.
 
-```{r}
+```{r, message=FALSE}
 states_1920 <- st_read("US_state_1920.shp", stringsAsFactors = FALSE)
 census_1920 <- read_csv("nhgis0002_csv/nhgis0002_ds43_1920_state.csv") %>% 
   rename(Population = A7L001)
@@ -63,13 +63,13 @@ census_1920 <- read_csv("nhgis0002_csv/nhgis0002_ds43_1920_state.csv") %>%
 
 Now that we've simplified and read in the shapefile, we have to change its projection so that it will map our data properly. To do that this, we will use GDAL. Because we are working in RStudio, we have two ways of using GDAL, through a command line or through the `st_transform()` argument in the sf R package. The command line method requires some extra effort, especially on Windows, so we will use `st_transform()` instead. 
 
-Should you want to use the command line method, you would first need to install GDAL (Very complicated on Windows <http://cartometric.com/blog/2011/10/17/install-gdal-on-windows/> and less so on OSx or Linux <https://github.com/lmullen/nghis-simplifier/>) and use the ogr2ogr tool that is part of the GDAL set of tools. You would then run the command `ogr2ogr output.shp -t_srs "EPSG:4326" input.shp`
+Should you want to use the command line method, you would first need to install GDAL (Very complicated on [Windows](http://cartometric.com/blog/2011/10/17/install-gdal-on-windows/) and less so on [OSx or Linux](https://github.com/lmullen/nghis-simplifier/)) and use the ogr2ogr tool that is part of the GDAL set of tools. You would then run the command `ogr2ogr output.shp -t_srs "EPSG:4326" input.shp`
 
 Just like in the mapping worksheet, we want to reproject our projection to EPSG 4326 using `st_transform()`.
 
 ```{r}
 states <- states_1920 %>% 
-  st_as_sf() %>% 
+  filter(!STATENAM %in% c("Alaska Territory", "Hawaii Territory")) %>% 
   st_transform(4326)
 ```
 
