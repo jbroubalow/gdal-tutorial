@@ -48,9 +48,9 @@ The next step is to simplify the shapefile within the spatial data so that it is
 
 4. Replace the old, unsimplified shapefile with the new, simplified one that you just downloaded. Note that the size of the new shapefile is much smaller than the old one.
 
-5. Upload the `.zip` folder containing your new shapefile to RStudio. RStudio will automatically extract the `.shp` file and the other necessary files. Also upload to RStudio the the folder containing the census data.
+5. Upload the `.zip` folder containing your new shapefile to RStudio. RStudio will automatically extract the `.shp` file and the other necessary files. Also upload to RStudio the folder containing the census data.
 
-6. Read in the shapefile and the census data (Note that I've also renamed the NGHIS code "A7L001" for the sake of clarity.
+6. Read in the shapefile and the census data (Note that I've also renamed the NHGIS code "A7L001" for the sake of clarity.
 
 ```{r, message=FALSE}
 states_1920 <- st_read("US_state_1920.shp", stringsAsFactors = FALSE)
